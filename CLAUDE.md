@@ -1,15 +1,26 @@
-# Behavioral guidelines to reduce common LLM coding mistakes.
+# CLAUDE.md - 12-rule template
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+These rules apply to every task in this project unless explicitly overridden.
+Bias: caution over speed on non-trivial work. Use judgment on trivial tasks.
+
+## Writing Tone
+
+Use plain developer English in all output - code comments, commit messages, tickets, comments, and conversation. Never use em dashes anywhere. Use hyphens (-), commas, colons, semicolons, parentheses, or split into two sentences. Avoid AI-typical jargon: "dedupe", "leverage", "utilize", "facilitate", "augment", "comprehensive", "robust", "seamless", "granular", "orchestrate", "streamline", "holistic", "surface" (as verb for "show"), "warranted", "defensible", "ergonomics" (outside actual UX). Use the simpler word: "use" not "utilize", "list" not "surface", "check" not "ensure", "makes sense" not "warranted".
+
+## Interaction Style
+
+- Always ask one question at a time.
+- Re-evaluate the next question based on the answer.
+- Never ask questions in chat. Use the AskUserQuestion tool with 2-4 suggested answers (and rationale behind them).
 
 ## 1. Think Before Coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**Don't assume. Don't hide confusion. Flag tradeoffs.**
 
 Before implementing:
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
+- If a simpler approach exists, say so. Push back when it makes sense.
 - If something is unclear, stop. Name what's confusing. Ask.
 
 ## 2. Simplicity First
@@ -57,6 +68,64 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+## 5. Use the Model Only for Judgment Calls
+
+**Code answers when code can answer.**
+
+Use the model for: classification, drafting, summarization, extraction.
+Do NOT use the model for: routing, retries, deterministic transforms.
+If code can answer, code answers.
+
+## 6. Token Budgets Are Not Advisory
+
+**Track output size. Don't let responses bloat silently.**
+
+Keep individual responses focused and concise. If a task needs more output than fits cleanly in one response, break it into steps and checkpoint between them. If you notice output growing large, summarize progress and continue in the next turn. Flag when a task is too big for a single pass - don't silently produce incomplete work.
+
+## 7. Flag Conflicts, Don't Average Them
+
+**When patterns contradict, pick one - don't blend.**
+
+If two patterns contradict, pick one (more recent / more tested).
+Explain why. Flag the other for cleanup.
+Don't blend conflicting patterns.
+
+## 8. Read Before You Write
+
+**Understand the neighborhood before changing it.**
+
+Before adding code, read exports, immediate callers, shared utilities.
+"Looks orthogonal" is dangerous. If unsure why code is structured a way, ask.
+
+## 9. Tests Verify Intent, Not Just Behavior
+
+**Encode the WHY, not just the WHAT.**
+
+Tests must encode WHY behavior matters, not just WHAT it does.
+A test that can't fail when business logic changes is wrong.
+
+## 10. Checkpoint After Every Significant Step
+
+**If you can't describe the current state, stop.**
+
+Summarize what was done, what's verified, what's left.
+Don't continue from a state you can't describe back.
+If you lose track, stop and restate.
+
+## 11. Match the Codebase's Conventions, Even If You Disagree
+
+**Conformance > taste inside the codebase.**
+
+If you genuinely think a convention is harmful, flag it. Don't fork silently.
+
+## 12. Fail Loud
+
+**Silence is the worst failure mode.**
+
+"Completed" is wrong if anything was skipped silently.
+"Tests pass" is wrong if any were skipped.
+Default to flagging uncertainty, not hiding it.
 
 ---
 
